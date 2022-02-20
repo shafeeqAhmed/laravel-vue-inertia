@@ -57,7 +57,7 @@
                             {{ worker.forenames }} {{ worker.surname }}
                           </li>
                         </ul>
-                      <attendees-modal-node :open="isOpenModal" :meeting-worker="meetingWorker" @closeModal="closeModal()"/>
+                      <attendees-modal-node :open="isOpenModal" :meeting="meeting" :meeting-worker="meetingWorker" @closeModal="closeModal()"/>
 
                     </dd>
                 </div>

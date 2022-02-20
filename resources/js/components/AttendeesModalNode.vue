@@ -68,6 +68,10 @@ export default {
     meetingWorker : {
       type:Object,
       required: true
+    },
+    meeting: {
+      type:Object,
+      required: true
     }
   },
   methods: {
@@ -82,7 +86,9 @@ export default {
           this.form
       )
           .then(response =>{
-            // this.closeModal()
+            Inertia.visit(`/meetings/${this.meeting.id}`)
+
+            this.closeModal()
               })
           // .then(this.updateWorker);
     }
