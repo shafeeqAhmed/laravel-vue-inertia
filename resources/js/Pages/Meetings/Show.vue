@@ -53,10 +53,23 @@
                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                         <ul class="list-disc">
 
-                          <li class="cursor-pointer" v-for="worker in attendees" @click="openModal(worker,meeting)">
-                            {{ worker.forenames }} {{ worker.surname }}
+                          <li class="cursor-pointer m-2  " v-for="worker in attendees" @click="openModal(worker,meeting)">
+                            <span class="hover:bg-blue-700 hover:text-white hover:p-1 hover:text-white-700">
+                              {{ worker.forenames }} {{ worker.surname }}
+                            </span>
                           </li>
                         </ul>
+
+
+                      <button type="button" @click="openAddAttendeeModal"  class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Add Attendee
+                      </button>
+                      <add-attendees-modal-node
+                          :isOpenAddAttendeesModal="isOpenAddAttendeesModal"
+                          :workers="workers"
+                          :attendee_types="attendee_types"
+                          :meeting="meeting"
+                          @closeAddAttendeeModal="closeAddAttendeeModal()"/>
                       <attendees-modal-node :open="isOpenModal" :meeting="meeting" :meeting-worker="meetingWorker" @closeModal="closeModal()"/>
 
                     </dd>
@@ -69,6 +82,7 @@
                         <ul class="list-disc">
                             <li v-for="worker in apologies">{{ worker.forenames }} {{ worker.surname }}</li>
                         </ul>
+
                     </dd>
                 </div>
                 <div v-if="no_shows.length > 0" class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -136,10 +150,12 @@
 import MinuteNode from "../../components/MinuteNode";
 import AgendaNode from "../../components/AgendaNode";
 import AttendeesModalNode from "../../components/AttendeesModalNode";
-import {ref} from "vue";
+import AddAttendeesModalNode from "../Meetings/Attendees/Create";
+
+import {ref, toRefs} from "vue";
 
 export default {
-    components: { MinuteNode, AgendaNode, AttendeesModalNode },
+    components: { MinuteNode, AgendaNode, AttendeesModalNode,AddAttendeesModalNode},
 
     props: {
         title: String,
@@ -151,22 +167,44 @@ export default {
         minutes: Object,
         documents: Object,
     },
-    methods: {
+
+  methods: {
       closeModal() {
         this.isOpenModal = false
       },
+
       openModal(meetingWorker,meeting) {
         this.isOpenModal = true
         this.meetingWorker = meetingWorker
         this.meetingWorker.meeting = meeting
-      }
+      },
+      openAddAttendeeModal() {
+          this.isOpenAddAttendeesModal = true
+        },
+      closeAddAttendeeModal() {
+      this.isOpenAddAttendeesModal = false
     },
-    setup() {
+    },
+    setup(props) {
+      const { meeting } = toRefs(props)
+
       const isOpenModal = ref(false)
+      const isOpenAddAttendeesModal = ref(false)
       const meetingWorker = ref(false)
+      const attendee_types = ref([])
+      const workers = ref([])
+      axios.get('/api/get-meeting-worker-data')
+          .then(response =>{
+            attendee_types.value = response.data.attendee_types
+            workers.value = response.data.workers
+          })
+
       return {
         isOpenModal,
-        meetingWorker
+        isOpenAddAttendeesModal,
+        meetingWorker,
+        attendee_types,
+        workers,
       }
     },
 

@@ -19,41 +19,37 @@ use Inertia\Inertia;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/php', function () {
-    dd(openssl_get_cert_locations());
-    phpinfo();
-});
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+Route::middleware('auth:sanctum', 'verified')->get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
+Route::group(['middleware'=>['auth:sanctum', 'verified','permission:meeting-permission'],'as'=>'meeting.','prefix'=>'meetings'], function(){
+
 # Meetings area
-Route::middleware(['auth:sanctum', 'verified'])->get('meetings', [MeetingController::class, 'index'])->middleware('permission:meeting-permission')->name('meeting.index');
-Route::middleware(['auth:sanctum', 'verified'])->get('meetings/create', [MeetingController::class, 'create'])->middleware('permission:meeting-permission')->name('meeting.create');
-Route::middleware(['auth:sanctum', 'verified'])->post('meetings', [MeetingController::class, 'store'])->middleware('permission:meeting-permission')->name('meeting.store');
-Route::middleware(['auth:sanctum', 'verified'])->get('meetings/{meeting}/edit', [MeetingController::class, 'edit'])->middleware('permission:meeting-permission')->name('meeting.edit');
-Route::middleware(['auth:sanctum', 'verified'])->get('meetings/{meeting}', [MeetingController::class, 'show'])->middleware('permission:meeting-permission')->name('meeting.show');
+    Route::get('', [MeetingController::class, 'index'])->name('index');
+    Route::get('/create', [MeetingController::class, 'create'])->name('create');
+    Route::post('', [MeetingController::class, 'store'])->name('store');
+    Route::get('/{meeting}/edit', [MeetingController::class, 'edit'])->name('edit');
+    Route::get('/{meeting}', [MeetingController::class, 'show'])->name('show');
 
 # Inertia Meetings routes
-Route::middleware(['auth:sanctum', 'verified'])->post('meetings/agendas', [AgendaController::class, 'store'])->middleware('permission:meeting-permission')->name('meeting.agenda.store');
-Route::middleware(['auth:sanctum', 'verified'])->post('meetings/minutes', [MinuteController::class, 'store'])->middleware('permission:meeting-permissione')->name('meeting.minute.store');
+    Route::post('/agendas', [AgendaController::class, 'store'])->name('agenda.store');
+    Route::post('/minutes', [MinuteController::class, 'store'])->name('minute.store');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('meetings/meeting_workers/{meeting}/create', [MeetingWorkerController::class, 'create'])->middleware('permission:meeting-permission')->name('meeting.worker.create');
-Route::middleware(['auth:sanctum', 'verified'])->post('meetings/meeting_workers/{meeting}', [MeetingWorkerController::class, 'store'])->middleware('permission:meeting-permission')->name('meeting.worker.store');
-Route::middleware(['auth:sanctum', 'verified'])->patch('meetings/meeting_workers/{meetingWorker}', [MeetingWorkerController::class, 'update'])->middleware('permission:meeting-permission')->name('meeting.worker.update');
-Route::middleware(['auth:sanctum', 'verified'])->delete('meetings/meeting_workers/{meetingWorker}', [MeetingWorkerController::class, 'destroy'])->middleware('permission:meeting-permission')->name('meeting.worker.delete');
+    Route::get('/meeting_workers/{meeting}/create', [MeetingWorkerController::class, 'create'])->name('worker.create');
+    Route::post('/meeting_workers/{meeting}', [MeetingWorkerController::class, 'store'])->name('worker.store');
+    Route::patch('/meeting_workers/{meetingWorker}', [MeetingWorkerController::class, 'update'])->name('worker.update');
+    Route::delete('/meeting_workers/{meetingWorker}', [MeetingWorkerController::class, 'destroy'])->name('worker.delete');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('meetings/documents/{meeting}/create', [DocumentController::class, 'create'])->middleware('permission:meeting-permission')->name('meeting.document.create');
-Route::middleware(['auth:sanctum', 'verified'])->post('meetings/documents/{meeting}', [DocumentController::class, 'store'])->middleware('permission:meeting-permission')->name('meeting.document.store');
-Route::middleware(['auth:sanctum', 'verified'])->delete('meetings/documents/{meeting}/{document}', [DocumentController::class, 'destroy'])->middleware('permission:meeting-permission')->name('meeting.document.delete');
-Route::middleware(['auth:sanctum', 'verified'])->get('meetings/documents/{document}', [DocumentController::class, 'show'])->middleware('permission:meeting-permission')->name('meeting.document.show');
+    Route::get('/documents/{meeting}/create', [DocumentController::class, 'create'])->name('document.create');
+    Route::post('/documents/{meeting}', [DocumentController::class, 'store'])->name('document.store');
+    Route::delete('/documents/{meeting}/{document}', [DocumentController::class, 'destroy'])->name('document.delete');
+    Route::get('/documents/{document}', [DocumentController::class, 'show'])->name('document.show');
 
-Route::middleware(['auth:sanctum', 'verified'])->delete('meetings/agendas/{agenda}', [AgendaController::class, 'destroy'])->middleware('permission:meeting-permission')->name('meeting.agenda.delete');
-Route::middleware(['auth:sanctum', 'verified'])->delete('meetings/minutes/{minute}', [MinuteController::class, 'destroy'])->middleware('permission:meeting-permission')->name('meeting.minute.delete');
+    Route::delete('/agendas/{agenda}', [AgendaController::class, 'destroy'])->name('agenda.delete');
+    Route::delete('/minutes/{minute}', [MinuteController::class, 'destroy'])->name('minute.delete');
 
-Route::middleware(['auth:sanctum', 'verified'])->patch('meetings/{meeting}', [MeetingController::class, 'update'])->middleware('permission:meeting-permission')->name('meeting.update');
+    Route::patch('/{meeting}', [MeetingController::class, 'update'])->name('update');
+
+});
+

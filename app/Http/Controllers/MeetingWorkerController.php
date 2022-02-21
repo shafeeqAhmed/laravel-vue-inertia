@@ -43,6 +43,21 @@ class MeetingWorkerController extends Controller
             'attendee_types' => $attendee_types
         ]);
     }
+    public function getMeetingWorkerData()
+    {
+        $workers = Worker::all();
+        $attendee_types = collect([
+            ['id' => 1,  'name' => 'Invited',  'description' => 'A person who has been invited for a meeting that is yet to occur'],
+            ['id' => 2,  'name' => 'Apologies',  'description' => 'A person who has sent apologies for a meeting that they can\'t attend'],
+            ['id' => 3,  'name' => 'Attended',  'description' => 'A person who attended the meeting'],
+            ['id' => 4,  'name' => 'No show',  'description' => 'A person who didn\'t turn up at the meeting'],
+        ]);
+        $data  = [
+            'workers' => $workers,
+            'attendee_types' => $attendee_types
+        ];
+        return response()->json($data);
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -91,7 +106,7 @@ class MeetingWorkerController extends Controller
 
         $meeting->workers()->attach(Worker::findOrFail($validated_data['worker_id']), ['invited' => $invited, 'attended' => $attended, 'apologies' => $apologies, 'notes' => $validated_data['notes']]);
 
-        return redirect()->route('meeting.worker.create',['meeting' => $meeting->id]);
+        return redirect()->route('meeting.show',['meeting' => $meeting->id]);
 
     }
 

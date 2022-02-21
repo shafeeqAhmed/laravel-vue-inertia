@@ -31,6 +31,7 @@
         "@heroicons/vue": "^1.0.5",
         "autoprefixer": "^10.4.2",
         "laravel-echo": "^1.11.3",
-        "pusher-js": "^7.0.6"
+        "pusher-js": "^7.0.6",
+        "vue-sweetalert2": "^5.0.2"
     }
 }
